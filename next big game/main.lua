@@ -1,6 +1,6 @@
 function love.load()
     spawntime = 0
-    yesspawn = love.math.random(1,5)
+    yesspawn = love.math.random(1,3)
     wf = require "libreries/windfield"
     world = wf.newWorld(0,0)
     world:setGravity(0,0)
@@ -29,14 +29,7 @@ function love.update(dt)
 playerkeys()
 world:update(dt)
 enemy_update(dt)
-
-spawntime = spawntime + 1*dt
-if spawntime >= yesspawn then
-    local random = love.math.random(1,3)
-    new_enemy(random,"true")
-    yesspawn = love.math.random(1,5)
-    spawntime = 0
-end
+spawn_enemy(dt)
 end
 
 function playerkeys()
@@ -46,16 +39,16 @@ function playerkeys()
     if love.keyboard.isDown("w") then
         vy = player.pose.velocity * -1
         player.pose.y = player.pose.y - player.pose.velocity
-    end
-    if love.keyboard.isDown("a") then
+
+    elseif love.keyboard.isDown("a") then
         vx = player.pose.velocity * -1
         player.pose.x = player.pose.x - player.pose.velocity
-    end
-    if love.keyboard.isDown("s") then
+
+    elseif love.keyboard.isDown("s") then
         vy = player.pose.velocity
         player.pose.y = player.pose.y + player.pose.velocity
-    end
-    if love.keyboard.isDown("d") then
+
+    elseif love.keyboard.isDown("d") then
         vx = player.pose.velocity
         player.pose.x = player.pose.x + player.pose.velocity
     end
@@ -109,10 +102,30 @@ function enemy_update(dt)
                 c.my = 0
                 c.t = 0
             end
+
+
         elseif c.rot == 3 then
+            if c.t >= 0.6 then
+                c.mx = c.speedmy
+            end
+
+            if c.t >= c.ran then
+                c.mx = 0
+                c.t = 0
+            end
+
+
         elseif c.rot == 4 then
+            if c.t >= 0.6 then
+                c.mx = c.speedpy
+            end
+
+            if c.t >= c.ran then
+                c.mx = 0
+                c.t = 0
+            end
         end
-    c.hitbox:setLinearVelocity(0,c.my*-1)
+    c.hitbox:setLinearVelocity(c.mx*-1,c.my*-1)
     end
 end
 
@@ -120,4 +133,14 @@ function love.keypressed(key)
     if key=="space" then 
         new_enemy(1)
     end
+end
+
+function spawn_enemy(dt)
+    spawntime = spawntime + 1*dt
+if spawntime >= yesspawn then
+    local random = love.math.random(1,3)
+    new_enemy(random,"true")
+    yesspawn = love.math.random(1,5)
+    spawntime = 0
+end
 end
