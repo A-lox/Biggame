@@ -1,6 +1,6 @@
 function love.load()
     spawntime = 0
-    yesspawn = love.math.random(1,3)
+    yesspawn = love.math.random(1,2)
     wf = require "libreries/windfield"
     world = wf.newWorld(0,0)
     world:setGravity(0,0)
@@ -14,15 +14,18 @@ function love.load()
     player.pose.y = wheight/ 2 - player.pose.h /2 - 100
     player.pose.velocity = 230
     player.pose.maxvelocity = 150
+    player.pose.rot = 0
     player.hitbox = world:newRectangleCollider(player.pose.x, player.pose.y, player.pose.w, player.pose.h)
     player.hitbox:setFixedRotation(true)
     player.sprite = {}
+    player.sprite.main1 = love.graphics.newImage("sprites/player.png")
     enemys = {}
-    new_enemy(3,"true")
+    new_enemy(4,"true")
 end
 
 function love.draw() 
     world:draw()
+    draw_player()                                                                                                                          
 end
 
 function love.update(dt)
@@ -140,7 +143,15 @@ function spawn_enemy(dt)
 if spawntime >= yesspawn then
     local random = love.math.random(1,3)
     new_enemy(random,"true")
-    yesspawn = love.math.random(1,5)
+    yesspawn = love.math.random(1,3)
     spawntime = 0
 end
+end
+
+function draw_player()
+    local hitx = player.hitbox:getX()
+    local hity = player.hitbox:getY()
+    local sx = 0.15
+    local sy = 0.15
+    love.graphics.draw(player.sprite.main1,hitx - 30,hity - 50,player.pose.rot,sx,sy)
 end
