@@ -18,7 +18,13 @@ function love.load()
     player.hitbox = world:newRectangleCollider(player.pose.x, player.pose.y, player.pose.w, player.pose.h)
     player.hitbox:setFixedRotation(true)
     player.sprite = {}
-    player.sprite.main1 = love.graphics.newImage("sprites/player.png")
+    player.sprite.main = {}
+    player.sprite.main.up = love.graphics.newImage("sprites/player_up.png")
+    player.sprite.main.down = love.graphics.newImage("sprites/player_down.png")
+    player.sprite.main.left = love.graphics.newImage("sprites/player_left.png")
+    player.sprite.main.right = love.graphics.newImage("sprites/player_right.png")
+    player.uprdown = 1
+    player.sprite.current = player.sprite.main.up
     enemys = {}
     new_enemy(4,"true")
 end
@@ -42,18 +48,23 @@ function playerkeys()
     if love.keyboard.isDown("w") then
         vy = player.pose.velocity * -1
         player.pose.y = player.pose.y - player.pose.velocity
-
+        player.sprite.current = player.sprite.main.up
+        player.uprdown = 1
     elseif love.keyboard.isDown("a") then
         vx = player.pose.velocity * -1
         player.pose.x = player.pose.x - player.pose.velocity
-
+        player.sprite.current = player.sprite.main.left
+        player.uprdown = 2
     elseif love.keyboard.isDown("s") then
         vy = player.pose.velocity
         player.pose.y = player.pose.y + player.pose.velocity
-
+        player.sprite.current = player.sprite.main.down
+        player.uprdown = 1
     elseif love.keyboard.isDown("d") then
         vx = player.pose.velocity
         player.pose.x = player.pose.x + player.pose.velocity
+        player.sprite.current = player.sprite.main.right
+        player.uprdown = 2
     end
 
     player.hitbox:setLinearVelocity(vx,vy)
@@ -151,7 +162,11 @@ end
 function draw_player()
     local hitx = player.hitbox:getX()
     local hity = player.hitbox:getY()
-    local sx = 0.15
-    local sy = 0.15
-    love.graphics.draw(player.sprite.main1,hitx - 30,hity - 50,player.pose.rot,sx,sy)
+    local sx = 0.12
+    local sy = 0.12
+    if player.uprdown == 1 then
+    love.graphics.draw(player.sprite.current,hitx - 24,hity - 35,player.pose.rot,sx,sy)
+    elseif player.uprdown == 2 then
+        love.graphics.draw(player.sprite.current,hitx - 35,hity - 24,player.pose.rot,sx,sy)
+    end
 end
