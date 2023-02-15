@@ -154,7 +154,7 @@ function spawn_enemy(dt)
 if spawntime >= yesspawn then
     local random = love.math.random(1,3)
     new_enemy(random,"true")
-    yesspawn = love.math.random(1,3)
+    yesspawn = love.math.random(1,1.5)
     spawntime = 0
 end
 end
