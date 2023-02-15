@@ -30,8 +30,13 @@ function love.load()
 end
 
 function love.draw() 
+    if love.keyboard.isDown("`") then
+        if love.keyboard.isDown("1") then
     world:draw()
-    draw_player()                                                                                                                          
+    end
+    end
+    draw_player()   
+    enemy_draw()                                                                                                                       
 end
 
 function love.update(dt)
@@ -75,6 +80,8 @@ function new_enemy(a,i)
         enemy = {}
         enemy.x = love.math.random(0,400)
         enemy.y = love.math.random(0, 668)
+        enemy.dx = 0
+        enemy.dy = 0
         enemy.mx = 0
         enemy.my = 0
         enemy.rot = love.math.random(1,4)
@@ -85,8 +92,31 @@ function new_enemy(a,i)
         enemy.speedpy = love.math.random(-150,-200)
         enemy.ran = love.math.random(0.9,1)
         enemy.hitbox = world:newRectangleCollider(enemy.x,enemy.y,enemy.w,enemy.h)
+        enemy.sprite = {}
+        enemy.sprite.up = love.graphics.newImage("sprites/fish_up.png")
+        enemy.sprite.down = love.graphics.newImage("sprites/fish_down.png")
+        enemy.sprite.left = love.graphics.newImage("sprites/fish_left.png")
+        enemy.sprite.right = love.graphics.newImage("sprites/fish_right.png")
         table.insert(enemys,enemy)
     end
+end
+
+function enemy_draw(dt)
+    
+    for i,c in ipairs(enemys) do
+        c.dx = c.hitbox:getX()
+        c.dy = c.hitbox:getY()
+        if c.rot  == 1 then
+            love.graphics.draw(c.sprite.up,c.dx - 19,c.dy - 22,0,0.4,0.4)
+        elseif c.rot == 2 then
+            love.graphics.draw(c.sprite.down,c.dx - 19,c.dy - 22,0,0.4,0.4)
+        elseif c.rot == 3 then
+            love.graphics.draw(c.sprite.left,c.dx - 19,c.dy - 22,0,0.4,0.4)
+        elseif c.rot == 4 then
+            love.graphics.draw(c.sprite.right,c.dx - 19,c.dy - 22,0,0.4,0.4)
+        end
+    end
+
 end
 
 function enemy_update(dt)
