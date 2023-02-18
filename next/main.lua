@@ -42,7 +42,8 @@ function love.draw()
     end
     draw_player()   
     enemy_draw()     
-    love.graphics.print(player.health,10,10)                                                                                                                  
+            
+    gui()                                                                                                       
 end
 
 function love.update(dt)
@@ -57,22 +58,22 @@ function playerkeys()
     local vx = 0
     local vy = 0
     local px, py = player.hitbox:getLinearVelocity()
-    if love.keyboard.isDown("w") then
+    if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
         vy = player.pose.velocity * -1
         player.pose.y = player.pose.y - player.pose.velocity
         player.sprite.current = player.sprite.main.up
         player.uprdown = 1
-    elseif love.keyboard.isDown("a") then
+    elseif love.keyboard.isDown("a") or love.keyboard.isDown("left") then
         vx = player.pose.velocity * -1
         player.pose.x = player.pose.x - player.pose.velocity
         player.sprite.current = player.sprite.main.left
         player.uprdown = 2
-    elseif love.keyboard.isDown("s") then
+    elseif love.keyboard.isDown("s") or love.keyboard.isDown("down") then
         vy = player.pose.velocity
         player.pose.y = player.pose.y + player.pose.velocity
         player.sprite.current = player.sprite.main.down
         player.uprdown = 1
-    elseif love.keyboard.isDown("d") then
+    elseif love.keyboard.isDown("d") or love.keyboard.isDown("right") then
         vx = player.pose.velocity
         player.pose.x = player.pose.x + player.pose.velocity
         player.sprite.current = player.sprite.main.right
@@ -224,6 +225,9 @@ function love.keypressed(key)
     if key=="l" then
         reset()
     end
+    if key=="escape" then
+        
+    end
 end
 
 function spawn_enemy(dt)
@@ -249,6 +253,7 @@ end
 
 function save()
     love.filesystem.write("save.txt",player.health)
+    print("saving")
 end
 
 function reed()
@@ -276,6 +281,16 @@ function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
            x2 < x1+w1 and
            y1 < y2+h2 and
            y2 < y1+h1
+  end
+
+  function gui()
+    if love.keyboard.isDown("escape") then
+        fpscounter = love.timer.getFPS( )
+    love.graphics.print("fps"..":"..fpscounter,5,40)
+  end
+  love.graphics.print(player.health,200,10)  
+  love.graphics.print('press"p"to save',5,0) 
+  love.graphics.print('press"o"to load',5,15)
   end
 
 
