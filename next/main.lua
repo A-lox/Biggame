@@ -4,6 +4,8 @@ function love.load()
     wf = require "libreries/windfield"
     world = wf.newWorld(0,0)
     world:setGravity(0,0)
+    world:addCollisionClass("player")
+    world:addCollisionClass("enemy")
     local wheight = love.graphics.getHeight( )
     local wwidth = love.graphics.getWidth( )
     player = {}
@@ -12,11 +14,12 @@ function love.load()
     player.pose.h = 50
     player.pose.x = wwidth/ 2 - player.pose.w /2
     player.pose.y = wheight/ 2 - player.pose.h /2 - 100
-    player.pose.velocity = 230
+    player.pose.velocity = 231
     player.pose.maxvelocity = 150
     player.pose.rot = 0
     player.hitbox = world:newRectangleCollider(player.pose.x, player.pose.y, player.pose.w, player.pose.h)
     player.hitbox:setFixedRotation(true)
+    player.hitbox:setCollisionClass("player")
     player.sprite = {}
     player.sprite.main = {}
     player.sprite.main.up = love.graphics.newImage("sprites/player_up.png")
@@ -25,6 +28,7 @@ function love.load()
     player.sprite.main.right = love.graphics.newImage("sprites/player_right.png")
     player.uprdown = 1
     player.sprite.current = player.sprite.main.up
+    player.health = 5
     enemys = {}
     new_enemy(4,"true")
     data = 1
@@ -37,7 +41,8 @@ function love.draw()
     end
     end
     draw_player()   
-    enemy_draw()                                                                                                                       
+    enemy_draw()     
+    love.graphics.print(player.health,10,10)                                                                                                                  
 end
 
 function love.update(dt)
@@ -45,6 +50,7 @@ playerkeys()
 world:update(dt)
 enemy_update(dt)
 spawn_enemy(dt)
+enemy_del(dt)
 end
 
 function playerkeys()
@@ -89,10 +95,13 @@ function new_enemy(a,i)
         enemy.w = 30
         enemy.h = 30
         enemy.t = 0
+        enemy.alive = 1
         enemy.speedmy = love.math.random(150,200)
         enemy.speedpy = love.math.random(-150,-200)
         enemy.ran = love.math.random(0.9,1)
         enemy.hitbox = world:newRectangleCollider(enemy.x,enemy.y,enemy.w,enemy.h)
+        enemy.hitbox:setCollisionClass("enemy")
+        enemy.hitbox:setFixedRotation(true)
         enemy.sprite = {}
         enemy.sprite.up = love.graphics.newImage("sprites/fish_up.png")
         enemy.sprite.down = love.graphics.newImage("sprites/fish_down.png")
@@ -105,6 +114,7 @@ end
 function enemy_draw(dt)
     
     for i,c in ipairs(enemys) do
+        if c.alive == 1 then
         c.dx = c.hitbox:getX()
         c.dy = c.hitbox:getY()
         if c.rot  == 1 then
@@ -117,13 +127,33 @@ function enemy_draw(dt)
             love.graphics.draw(c.sprite.right,c.dx - 19,c.dy - 22,0,0.4,0.4)
         end
     end
+    end
 
+end
+
+function enemy_del(dt)
+    hitx = player.hitbox:getX()
+    hity = player.hitbox:getY() 
+    for i,c in ipairs(enemys) do
+        if c.alive == 1 then
+        local dx = c.hitbox:getX()
+        local dy = c.hitbox:getY()
+                if  c.hitbox:enter("player")  then
+                    print("colid. enemy w player - 1 hp")
+                    player.health = player.health - 1
+                    c.hitbox:destroy()
+                    c.alive = 0
+                end
+        end
+    end
 end
 
 function enemy_update(dt)
    
     for i,c in ipairs(enemys) do
-        c.t = c.t + 1*dt
+        if c.alive == 1 then
+            c.t = c.t + 1*dt
+        
 
             if c.rot == 1 then
                 
@@ -170,9 +200,15 @@ function enemy_update(dt)
                 c.t = 0
             end
         end
-    c.hitbox:setLinearVelocity(c.mx*-1,c.my*-1)
+        c.hitbox:setLinearVelocity(c.mx*-1,c.my*-1)
+        
+        
+     end
     end
 end
+
+
+
 
 function love.keypressed(key)
     if key=="space" then 
@@ -180,10 +216,13 @@ function love.keypressed(key)
     end
 
     if key=="p" then
-        write()
+        save()
     end
-    if key=="r" then
+    if key=="o" then
         reed()
+    end
+    if key=="l" then
+        reset()
     end
 end
 
@@ -198,8 +237,7 @@ end
 end
 
 function draw_player()
-    local hitx = player.hitbox:getX()
-    local hity = player.hitbox:getY() 
+    
     local sx = 0.12
     local sy = 0.12
     if player.uprdown == 1 then
@@ -209,11 +247,35 @@ function draw_player()
     end
 end
 
-function write()
-    love.filesystem.write("save.txt",data)
+function save()
+    love.filesystem.write("save.txt",player.health)
 end
 
 function reed()
     file = love.filesystem.read("save.txt")
     print(file)
+    player.health = file
+    
+    print()
 end
+
+function reset()
+    
+end
+
+function AABB(x1, y1, w1, h1, x2, y2, w2, h2)
+    return x1 < x2 + w2 and
+           x1 + w1 > x2 and
+           y1 < y2 + h2 and
+           y1 + h1 > y2
+end
+
+function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
+    return x1 < x2+w2 and
+           x2 < x1+w1 and
+           y1 < y2+h2 and
+           y2 < y1+h1
+  end
+
+
+
