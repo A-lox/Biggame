@@ -255,12 +255,13 @@ function reed()
     file = love.filesystem.read("save.txt")
     print(file)
     player.health = file
-    
     print()
 end
 
 function reset()
-    
+print("reseting...")
+love.filesystem.write("save.txt",5)
+print("reset")
 end
 
 function AABB(x1, y1, w1, h1, x2, y2, w2, h2)
