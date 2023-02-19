@@ -1,6 +1,6 @@
 function love.load()
     spawntime = 0
-    yesspawn = love.math.random(1,2)
+    yesspawn = love.math.random(0.5,1.5)
     wf = require "libreries/windfield"
     world = wf.newWorld(0,0)
     world:setGravity(0,0)
@@ -35,6 +35,7 @@ function love.load()
 end
 
 function love.draw() 
+    bg()
     if love.keyboard.isDown("`") then
         if love.keyboard.isDown("1") then
     world:draw()
@@ -233,9 +234,9 @@ end
 function spawn_enemy(dt)
     spawntime = spawntime + 1*dt
 if spawntime >= yesspawn then
-    local random = love.math.random(1,3)
+    local random = love.math.random(1,2)
     new_enemy(random,"true")
-    yesspawn = love.math.random(1,1.5)
+    yesspawn = love.math.random(0.4,0.9)
     spawntime = 0
 end
 end
@@ -291,6 +292,12 @@ function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
   love.graphics.print(player.health,200,10)  
   love.graphics.print('press"p"to save',5,0) 
   love.graphics.print('press"o"to load',5,15)
+  end
+
+  function bg()
+    love.graphics.setColor(0.6,0.6,0.7,0.4)
+    love.graphics.rectangle("fill",-5,-5,800,800)
+    love.graphics.setColor(1,1,1)
   end
 
 
